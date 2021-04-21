@@ -5,60 +5,47 @@ const dbFunction = require('../database.js');
 const db = dbFunction();
 
 router.get('/', async (req, res) => {
-	const colRef = await db.collection('hamsters').get();
-	let allHamsters = [];
-	colRef.forEach(docRef => {
-		let hamster = docRef.data();
-		allHamsters.push(hamster);
-	});
+	const allHamsters = await getHamsters();
 	res.send(allHamsters);
 });
 
 router.get('/random', async (req, res) => {
-
-	const colRef = await db.collection('hamsters').get();
-	let allHamsters = [];
-	colRef.forEach(docRef => {
-		let hamster = docRef.data();
-		allHamsters.push(hamster);
-	});
-	let index = parseInt(allHamsters.length);
-	let randomIndex = Math.floor(Math.random() * (index - 1));
-	res.send(allHamsters[randomIndex]);
+	const allHamsters = await getHamsters();
+	let index = Math.floor(Math.random() * (allHamsters.length - 1));
+	res.send(allHamsters[index]);
 })
 
 router.get('/:id', async (req, res) => {
 	const id = req.params.id;
-	if (!id) {
-		res.sendStatus(400);
-	}
-	const response = await db.collection('hamsters').doc(id).get();
-	data = response.data();
-	res.send(data)
+	const docRef = await db.collection('hamsters').doc(id).get();
+	data = docRef.data();
+	data.firestoreId = docRef.id; //för tillgång till firestore id från frontend.
+	res.send(data);
 });
 
 
 router.post('/', async (req, res) => {
 	const data = req.body;
 
-	//Fixa så att datan blir rätt...
-	if( !data ) {
-		res.sendStatus(400);
+	if ( isEmpty(data) ) {
+		res.status(400).send('You must send with right data.');
 		return
 	}
 	let response = await db.collection('hamsters').add(data);
 	res.status(200).send(response.id);
 });
 
+
+
+//Måste finnas pga om du gör en put utan parameter...
+router.put('/', (req, res) => {
+	res.status(404).send('You must enter a valid ID to an hamster.')
+});
+
 router.put('/:id', async (req, res) => {
 	let id = req.params.id;
 	let data = req.body;
 
-	//testat !data i if satsen men den fungerar ej..
-	if (!id) {
-		res.sendStatus(404);
-		return
-	}
 	await db.collection('hamsters').doc(id).set(data, {merge: true})
 	res.sendStatus(200);
 	
@@ -66,11 +53,28 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	const id = req.params.id; 
-	if(!id) {
-		res.send(404);
-	}
 	await db.collection('hamsters').doc(id).delete()
 	res.sendStatus(200);
 });
+
+/////////Utomstående funktioner//////////
+
+//kolla om objectet är tom
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+async function getHamsters() {
+	const snapshot = await db.collection('hamsters').get();
+	let allHamsters = [];
+	snapshot.forEach(docRef => {
+		let hamster = docRef.data();
+		allHamsters.push(hamster);
+	});
+	return allHamsters;
+}
+async function checkHamsterID(id) {
+
+}
+
 
 module.exports = router;

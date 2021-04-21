@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 });
 
 //Static folders
-app.use(express.static('./images/hamsters'));
+app.use('/img', express.static(path.join(__dirname, 'img')));
 
 
 //Routes
