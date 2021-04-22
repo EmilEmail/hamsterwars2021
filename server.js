@@ -5,6 +5,7 @@ const hamsters = require('./routes/hamsters.js');
 const matches = require('./routes/matches.js');
 const matchWinners = require('./routes/matchwinners.js');
 const winners = require('./routes/winners.js');
+const losers = require('./routes/losers.js');
 const path = require('path');
 const cors = require('cors');
 
@@ -26,6 +27,7 @@ app.use('/hamsters', hamsters);
 app.use('/matches', matches);
 app.use('/matchwinners', matchWinners);
 app.use('/winners', winners);
+app.use('/losers', losers);
 
 
 //Start server
