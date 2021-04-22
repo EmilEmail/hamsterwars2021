@@ -20,13 +20,11 @@ router.get('/', async (req, res) => {
 	}
 
 	let sortedList = allHamsters.sort(function (a, b) {
-		return a.wins - b.wins;
+		return a.defeats - b.defeats;
 	});
 
 	sortedList.reverse();
 	sortedList.splice(5);
-
-	let fiveTop = [];
 
 	res.send(sortedList);
 });

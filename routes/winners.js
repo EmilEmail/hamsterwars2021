@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 	} catch (error) {
 		console.log(error)
 		res.status(500);
-		return
+		return;
 	}
 
 	let sortedList = allHamsters.sort(function (a, b) {
@@ -25,8 +25,6 @@ router.get('/', async (req, res) => {
 
 	sortedList.reverse();
 	sortedList.splice(5);
-
-	let fiveTop = [];
 
 	res.send(sortedList);
 });
