@@ -3,6 +3,8 @@ const app = express();
 const PORT = 1337;
 const hamsters = require('./routes/hamsters.js');
 const matches = require('./routes/matches.js');
+const matchWinners = require('./routes/matchwinners.js');
+const winners = require('./routes/winners.js');
 const path = require('path');
 const cors = require('cors');
 
@@ -22,6 +24,8 @@ app.use('/img', express.static(path.join(__dirname, 'img')));
 //Routes
 app.use('/hamsters', hamsters);
 app.use('/matches', matches);
+app.use('/matchwinners', matchWinners);
+app.use('/winners', winners);
 
 
 //Start server

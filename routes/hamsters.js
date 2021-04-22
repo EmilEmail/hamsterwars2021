@@ -4,13 +4,13 @@ const router = express.Router();
 const dbFunction = require('../database.js');
 const db = dbFunction();
 
-// router.post('/postallhamsters', async(req, res) => {
-// 	const allHamsters = req.body;
-// 	await allHamsters.forEach(hamster => {
-// 		db.collection('hamsters').add(hamster);
-// 	});
-// 	res.status(200).send('You have got all hamsters in database!')
-// });
+router.post('/postallhamsters', async(req, res) => {
+	const allHamsters = req.body;
+	await allHamsters.forEach(hamster => {
+		db.collection('hamsters').add(hamster);
+	});
+	res.status(200).send('You have got all hamsters in database!')
+});
 
 router.get('/', async (req, res) => {
 	try {
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 		res.send(allHamsters);
 		
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 	}
 });
 
@@ -142,9 +142,14 @@ async function getHamsters() {
 	return allHamsters;
 }
 async function checkHamsterId(id) {
-	let allHamsters = await getHamsters();
-	let exists = allHamsters.find(hamster => id === hamster.firestoreId);
-	return exists;
+	try {
+		let allHamsters = await getHamsters();
+		let exists = allHamsters.find(hamster => id === hamster.firestoreId);
+		return exists;
+		
+	} catch (error) {
+		console.log(error);
+	}
 }
 
 //designbeslut, har man skrivit något fel så går det ej att genomföra operationen.
@@ -183,7 +188,8 @@ function newHamsterCheck(data) {
 		'imgName',
 		'loves',
 		'name',
-		'wins'
+		'wins',
+		'id'
 	]
 	
 	dataKeys.forEach(dataKey => {
@@ -194,8 +200,7 @@ function newHamsterCheck(data) {
 		});
 	});
 
-	if (correctKeys.length < hamsterKeys.length) {
-		console.log('innneee')
+	if (correctKeys.length != hamsterKeys.length) {
 		return false;
 	}
 	return true;
