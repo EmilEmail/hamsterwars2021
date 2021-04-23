@@ -50,13 +50,14 @@ router.get('/:id', async (req, res) => {
 	const id = req.params.id;
 	const exists = await checkHamsterId(id);
 	if (!exists) {
-		res.status(404).send('There is no hamster with that ID.')
-		return
+		res.status(404).send('There is no hamster with that ID.');
+		return;
 	}
 	if (exists === 500) {
 		res.sendStatus(500);
+		return;
 	}
-	res.send(exists);
+	res.status(200).send(exists);
 });
 
 /////klar hit
@@ -130,6 +131,7 @@ router.delete('/', (req, res) => {
 router.delete('/:id', async (req, res) => {
 	const id = req.params.id; 
 	const exists = await checkHamsterId(id);
+	console.log(exists);
 	if (!exists) {
 		res.status(404).send('Hamster ID does not exists!');
 		return;
@@ -167,16 +169,13 @@ async function getHamsters() {
 	return allHamsters;
 }
 async function checkHamsterId(id) {
-		let allHamsters = await getHamsters();
-		if(!allHamsters) {
-			return false;
-		}
-		let exists = allHamsters.find(hamster => id === hamster.firestoreId);
-		console.log(exists)
-		if (!exists) {
-			return false;
-		}
-		return exists;
+	let allHamsters = await getHamsters();
+	console.log(allHamsters)
+	let exists = allHamsters.find(hamster => id == hamster.firestoreId);
+	if (!exists) {
+		return false;
+	}
+	return exists;
 }
 
 async function checkData(data, id) {
@@ -222,7 +221,7 @@ function hamsterKeyType(data) {
 		typeof data.name,
 		typeof data.loves,
 		typeof data.favFood,
-		typeof data.imgName
+		typeof data.imgName,
 	]
 	numberKeyType = [
 		data.age,
@@ -237,7 +236,7 @@ function hamsterKeyType(data) {
 		}
 	}
 	for (let i = 0; i < stringkeyType.length; i++) {
-		if (Number.isInteger(numberKeyType[i])) {
+		if (!Number.isInteger(numberKeyType[i])) {
 			return false;
 		}
 	}
