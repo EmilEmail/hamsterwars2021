@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 1337;
+const PORT = process.env.PORT || 1337;
 const hamsters = require('./routes/hamsters.js');
 const matches = require('./routes/matches.js');
 const matchWinners = require('./routes/matchwinners.js');
