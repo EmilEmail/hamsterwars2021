@@ -29,12 +29,17 @@ router.get('/:id', async(req, res) => {
 router.post('/', async (req, res) => {
 	const data = req.body;
 	const correctData = newMatchCheck(data);
+	const correctDataType = checkDataKeyType()
+	if (isEmpty(data)) {
+		res.status(400).send('You must send with any data.');
+		return;
+	}
 	if (!correctData) {
 		res.status(400).send('You must add right keys to your object.');
 		return;
 	}
-	if (isEmpty(data)) {
-		res.status(400).send('You must send with any data.');
+	if(!correctDataType) {
+		res.status(400).send('You must have the right data type.');
 		return;
 	}
 	try {
@@ -105,7 +110,7 @@ function newMatchCheck(data) {
 	let correctKeys = [];
 	const matchKeys = [
 		'winnerId',
-		'loserId',
+		'loserId'
 	]
 	
 	dataKeys.forEach(dataKey => {
@@ -118,6 +123,19 @@ function newMatchCheck(data) {
 
 	if (correctKeys.length != matchKeys.length) {
 		return false;
+	}
+	return true;
+}
+
+function checkDataKeyType(data) {
+	const keyType = [
+		typeof data.winnerId,
+		typeof data.loserId,
+	]
+	for (let i = 0; i < keyType.length; i++) {
+		if (stringkeyType[i] != 'string') {
+			return false;
+		}
 	}
 	return true;
 }

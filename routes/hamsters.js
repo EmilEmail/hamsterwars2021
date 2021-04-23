@@ -4,6 +4,17 @@ const router = express.Router();
 const dbFunction = require('../database.js');
 const db = dbFunction();
 
+const hamsterKeys = [
+	'age',
+	'defeats',
+	'favFood',
+	'games',
+	'imgName',
+	'loves',
+	'name',
+	'wins'
+]
+
 
 //Få upp allt JSON-filen i databasen.
 router.post('/postallhamsters', async(req, res) => {
@@ -52,18 +63,21 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
 	const data = req.body;
-
-	//kolla denna function
+	
+	//designbeslut, har man skrivit något fel så går det ej att genomföra operationen.
 	const correctData = newHamsterCheck(data);
-	////
-	console.log(correctData)
-
+	const correctDataType = hamsterKeyType(data);
+	
 	if (isEmpty(data)) {
 		res.status(400).send('You must send with any data.');
 		return;
 	}
 	if (!correctData) {
 		res.status(400).send('One or more of the objects keys are miss-spelled or missing.');
+		return;
+	}
+	if(!correctDataType) {
+		res.status(400).send('You must have the right data type.');
 		return;
 	}
 	try {
@@ -76,9 +90,6 @@ router.post('/', async (req, res) => {
 	}
 });
 
-
-
-//Måste finnas pga om du gör en put utan parameter...
 router.put('/', (req, res) => {
 	res.status(404).send('You must enter a valid ID to an hamster.');
 });
@@ -87,11 +98,15 @@ router.put('/:id', async (req, res) => {
 	const id = req.params.id;
 	const data = req.body;
 	const exists = await checkHamsterId(id);
-	const checkObjectKeys = await checkData(data, id);
+	if (isEmpty(data)) {
+		res.sendStatus(400);
+	}
 	if (!exists) {
 		res.status(404).send('There is no hamster with that ID.')
 		return;
 	}
+
+	const checkObjectKeys = await checkData(data, id);
 	if (!checkObjectKeys) {
 		res.status(400).send('You must enter a hamster with correct keys.')
 		return;
@@ -157,10 +172,13 @@ async function checkHamsterId(id) {
 			return false;
 		}
 		let exists = allHamsters.find(hamster => id === hamster.firestoreId);
+		console.log(exists)
+		if (!exists) {
+			return false;
+		}
 		return exists;
 }
 
-//designbeslut, har man skrivit något fel så går det ej att genomföra operationen.
 async function checkData(data, id) {
 	const hamster = await checkHamsterId(id);
 	const dataKeys = (Object.keys(data));
@@ -181,35 +199,47 @@ async function checkData(data, id) {
 }
 
 
-//kolla till denna function!
 function newHamsterCheck(data) {
 	const dataKeys = (Object.keys(data));
 	let correctKeys = [];
-	let hamsterKeys = [
-		'age',
-		'defeats',
-		'favFood',
-		'games',
-		'imgName',
-		'loves',
-		'name',
-		'wins',
-		'id'
-	]
 	
 	dataKeys.forEach(dataKey => {
 		hamsterKeys.forEach(hamsterKey => {
-			if (dataKey === hamsterKey) {
-				correctKeys.push(dataKey)
+			if (dataKey == hamsterKey) {
+				correctKeys.push(dataKey);
 			}
 		});
 	});
 
-	console.log(correctKeys.length)
-	console.log(hamsterKeys.length)
-
 	if (correctKeys.length != hamsterKeys.length) {
 		return false;
+	}
+	return true;
+}
+
+function hamsterKeyType(data) {
+	const stringkeyType = [
+		typeof data.name,
+		typeof data.loves,
+		typeof data.favFood,
+		typeof data.imgName
+	]
+	numberKeyType = [
+		data.age,
+		data.games,
+		data.wins,
+		data.defeats
+	]
+
+	for (let i = 0; i < stringkeyType.length; i++) {
+		if (stringkeyType[i] != 'string') {
+			return false;
+		}
+	}
+	for (let i = 0; i < stringkeyType.length; i++) {
+		if (Number.isInteger(numberKeyType[i])) {
+			return false;
+		}
 	}
 	return true;
 }
