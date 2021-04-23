@@ -34,9 +34,10 @@ h2 {
 ul {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
-	gap: 20px;
+	justify-items: center;
 	list-style: none;
 	margin: 32px;
+	padding: 0;
 }
 li {
 	display: flex;
@@ -45,8 +46,15 @@ li {
 	background: white;
 	max-width: 200px;
 	max-height: 200px;
+	margin: 5px;
 }
 img {
 	max-width: 100px;
 	max-height: 100px;
 }
+
+@media only screen and (max-width: 800px) {
+	ul {
+		grid-template-columns: repeat(3, 1fr);
+	}
+  }
