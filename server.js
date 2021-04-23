@@ -20,6 +20,7 @@ app.use((req, res, next) => {
 
 //Static folders
 app.use('/img', express.static(path.join(__dirname, 'img')));
+app.use('/', express.static(path.join(__dirname, 'frontend')));
 
 
 //Routes
