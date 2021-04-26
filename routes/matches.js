@@ -4,8 +4,13 @@ const router = express.Router();
 const dbFunction = require('../database.js');
 const db = dbFunction();
 
+const THIS_COLLECTION = 'matches';
+
+const functions = require('./globalFunctions.js').functions;
+
 router.get('/', async (req, res) => {
-	const data = await getAllMatches();
+	// const data = await getAllMatches();
+	const data = await functions.get(THIS_COLLECTION);
 	if(!data){
 		res.sendStatus(500);
 	}
@@ -14,7 +19,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async(req, res) => {
 	const id = req.params.id;
-	let data = await checkMatchId(id);
+	let data = await functions.checkId(id, THIS_COLLECTION);
 	if(!data) {
 		res.sendStatus(500);
 		return;
@@ -60,7 +65,7 @@ router.delete('/', (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	const id = req.params.id;
-	const exists = await checkMatchId(id);
+	const exists = await functions.checkId(id);
 	if (!exists) {
 		res.status(404).send('You must have a corrext match ID.');
 		return;
@@ -74,22 +79,22 @@ function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-async function getAllMatches() {
-	let allMatches = [];
-	try {
-		const snapshot = await db.collection('matches').get();
-		snapshot.forEach(docRef => {
-			let match = docRef.data();
-			match.firestoreId = docRef.id;
-			allMatches.push(match);
-		});
-	} catch (error) {
-		console.log(error);
-		return false;
-	}
-	return allMatches;
-}
-async function checkMatchId(id) {
+// async function getAllMatches() {
+// 	let allMatches = [];
+// 	try {
+// 		const snapshot = await db.collection('matches').get();
+// 		snapshot.forEach(docRef => {
+// 			let match = docRef.data();
+// 			match.firestoreId = docRef.id;
+// 			allMatches.push(match);
+// 		});
+// 	} catch (error) {
+// 		console.log(error);
+// 		return false;
+// 	}
+// 	return allMatches;
+// }
+async function checkMatchId(id) { //kolla igenom ////////////////////////////////////////////////////
 	try {
 		let allMatches = await getAllMatches();
 		let exists = allMatches.find(match => id === match.firestoreId);
