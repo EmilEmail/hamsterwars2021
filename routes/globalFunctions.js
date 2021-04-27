@@ -4,25 +4,27 @@ const db = dbFunction();
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
-async function get(nameOf) {
-	let allHamsters = [];
+
+async function get(COLLECTION) {
+	let allFromCollection = [];
 	try {
-		const snapshot = await db.collection(`${nameOf}`).get();
+		const snapshot = await db.collection(`${COLLECTION}`).get();
 		snapshot.forEach(docRef => {
-			let hamster = docRef.data();
-			hamster.firestoreId = docRef.id;
-			allHamsters.push(hamster);
+			let item = docRef.data();
+			item.firestoreId = docRef.id;
+			allFromCollection.push(item);
 		});
 		
 	} catch (error) {
 		console.log(error);
 		return false;
 	}
-	return allHamsters;
+	return allFromCollection;
 }
-async function checkId(id, nameOf) {
-	let allHamsters = await get(`${nameOf}`);
-	let exists = allHamsters.find(hamster => id == hamster.firestoreId);
+
+async function checkId(id, COLLECTION) {
+	let allFromCollection = await get(`${COLLECTION}`);
+	let exists = allFromCollection.find(item => id == item.firestoreId);
 	if (!exists) {
 		return false;
 	}
@@ -30,14 +32,14 @@ async function checkId(id, nameOf) {
 }
 
 async function checkData(data, id, THIS_COLLECTION) {
-	const hamster = await checkId(id, THIS_COLLECTION);
+	const item = await checkId(id, THIS_COLLECTION);
 	const dataKeys = (Object.keys(data));
-	const hamsterKeys = Object.keys(hamster);
+	const itemKeys = Object.keys(item);
 	let correctKeys = [];
 
 	dataKeys.forEach(dataKey => {
-		hamsterKeys.forEach(hamsterKey => {
-			if (dataKey === hamsterKey) {
+		itemKeys.forEach(itemKey => {
+			if (dataKey === itemKey) {
 				correctKeys.push(dataKey);
 			}
 		});
@@ -48,60 +50,24 @@ async function checkData(data, id, THIS_COLLECTION) {
 	return true;
 }
 
-
-function newHamsterCheck(data) {
+function newItemCheck(data, defaultKeys) {
 	const dataKeys = (Object.keys(data));
 	let correctKeys = [];
-	const hamsterKeys = [
-		'age',
-		'defeats',
-		'favFood',
-		'games',
-		'imgName',
-		'loves',
-		'name',
-		'wins'
-	]
 	
 	dataKeys.forEach(dataKey => {
-		hamsterKeys.forEach(hamsterKey => {
-			if (dataKey == hamsterKey) {
+		defaultKeys.forEach(defaultKey => {
+			if (dataKey == defaultKey) {
 				correctKeys.push(dataKey);
 			}
 		});
 	});
 
-	if (correctKeys.length != hamsterKeys.length) {
-		return false;
+	if (correctKeys.length === dataKeys.length && correctKeys.length === defaultKeys.length) {
+		return true;
 	}
-	return true;
+	return false;
 }
 
-function hamsterKeyType(data) {
-	const stringkeyType = [
-		typeof data.name,
-		typeof data.loves,
-		typeof data.favFood,
-		typeof data.imgName,
-	]
-	numberKeyType = [
-		data.age,
-		data.games,
-		data.wins,
-		data.defeats
-	]
 
-	for (let i = 0; i < stringkeyType.length; i++) {
-		if (stringkeyType[i] != 'string') {
-			return false;
-		}
-	}
-	for (let i = 0; i < stringkeyType.length; i++) {
-		if (!Number.isInteger(numberKeyType[i])) {
-			return false;
-		}
-	}
-	return true;
-}
 
-module.exports.functions = { checkId, get, isEmpty, checkData, newHamsterCheck, hamsterKeyType }
+module.exports.functions = { checkId, get, isEmpty, checkData, newItemCheck }

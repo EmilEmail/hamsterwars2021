@@ -9,15 +9,7 @@ const functions = require('./globalFunctions.js').functions;
 const THIS_COLLECTION = 'hamsters';
 
 
-//Få upp allt JSON-filen i databasen.
-router.post('/postallhamsters', async(req, res) => {
-	const allHamsters = req.body;
-	await allHamsters.forEach(hamster => {
-		db.collection('hamsters').add(hamster);
-	});
-	res.status(200).send('You have got all hamsters in database!')
-});
-//////////////
+						//////GET//////
 
 router.get('/', async (req, res) => {
 		const allHamsters = await functions.get(THIS_COLLECTION);
@@ -53,14 +45,14 @@ router.get('/:id', async (req, res) => {
 	res.status(200).send(exists);
 });
 
-/////klar hit
+						//////POST//////
 
 router.post('/', async (req, res) => {
 	const data = req.body;
+	const defaultKeys = ['age','defeats','favFood','games','imgName','loves','name','wins']
 	
-	//designbeslut, har man skrivit något fel så går det ej att genomföra operationen.
-	const correctData = functions.newHamsterCheck(data);
-	const correctDataType = functions.hamsterKeyType(data);
+	const correctData = functions.newItemCheck(data, defaultKeys);
+	const correctDataType = hamsterKeyType(data);
 	
 	if (functions.isEmpty(data)) {
 		res.status(400).send('You must send with any data.');
@@ -83,6 +75,8 @@ router.post('/', async (req, res) => {
 		res.sendStatus(500);
 	}
 });
+
+						//////PUT//////
 
 router.put('/', (req, res) => {
 	res.status(404).send('You must enter a valid ID to an hamster.');
@@ -117,6 +111,8 @@ router.put('/:id', async (req, res) => {
 	
 });
 
+						//////DELETE//////
+
 router.delete('/', (req, res) => {
 	res.sendStatus(400).send('You must enter a valid ID.')
 });
@@ -138,6 +134,44 @@ router.delete('/:id', async (req, res) => {
 		console.log(error);
 		res.sendStatus(500);
 	}
+});
+
+					////Check KeyTypes////
+function hamsterKeyType(data) {
+	const stringkeyType = [
+		typeof data.name,
+		typeof data.loves,
+		typeof data.favFood,
+		typeof data.imgName,
+	]
+	numberKeyType = [
+		data.age,
+		data.games,
+		data.wins,
+		data.defeats
+	]
+
+	for (let i = 0; i < stringkeyType.length; i++) {
+		if (stringkeyType[i] != 'string') {
+			return false;
+		}
+	}
+	for (let i = 0; i < stringkeyType.length; i++) {
+		if (!Number.isInteger(numberKeyType[i])) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+//Få upp allt JSON-filen i databasen.
+router.post('/postallhamsters', async(req, res) => {
+	const allHamsters = req.body;
+	await allHamsters.forEach(hamster => {
+		db.collection('hamsters').add(hamster);
+	});
+	res.status(200).send('You have got all hamsters in database!')
 });
 
 module.exports = router;

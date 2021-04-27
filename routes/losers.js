@@ -4,25 +4,14 @@ const router = express.Router();
 const dbFunction = require('../database.js');
 const db = dbFunction();
 
-router.get('/', async (req, res) => {
-	let allHamsters  = [];
-	try {
-		const snapshot = await db.collection('hamsters').get();
-		snapshot.forEach(docRef => {
-			hamster = docRef.data();
-			allHamsters.push(hamster);
-		});
-		
-	} catch (error) {
-		console.log(error)
-		res.status(500);
-		return
-	}
+const functions = require('./globalFunctions.js').functions;
 
+router.get('/', async (req, res) => {
+
+	const allHamsters = await functions.get('hamsters');
 	let sortedList = allHamsters.sort(function (a, b) {
 		return a.defeats - b.defeats;
 	});
-
 	sortedList.reverse();
 	sortedList.splice(5);
 
