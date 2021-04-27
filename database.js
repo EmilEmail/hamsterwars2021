@@ -1,10 +1,10 @@
 const admin = require("firebase-admin");
 let serviceAccount; 
 
-try {
-	serviceAccount = require("./private_key.json");
-} catch (error) {
+if (process.env.PRIVATE_KEY) {
 	serviceAccount = JSON.parse(process.env.PRIVATE_KEY);
+} else {
+	serviceAccount = require("./private_key.json");
 }
 
 admin.initializeApp({
