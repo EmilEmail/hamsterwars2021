@@ -6,6 +6,10 @@ const matches = require('./routes/matches.js');
 const matchWinners = require('./routes/matchwinners.js');
 const winners = require('./routes/winners.js');
 const losers = require('./routes/losers.js');
+const defeated = require('./routes/defeated.js');
+const fewmatches = require('./routes/fewmatches.js');
+const manymatches = require('./routes/manymatches.js');
+const score = require('./routes/score.js');
 const path = require('path');
 const cors = require('cors');
 
@@ -29,6 +33,10 @@ app.use('/matches', matches);
 app.use('/matchwinners', matchWinners);
 app.use('/winners', winners);
 app.use('/losers', losers);
+app.use('/defeated', defeated);
+app.use('/fewMatches', fewmatches);
+app.use('/manyMatches', manymatches);
+app.use('/score', score);
 
 
 //Start server
