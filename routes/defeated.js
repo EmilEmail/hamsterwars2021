@@ -3,7 +3,7 @@ const router = express.Router();
 
 const functions = require('./globalFunctions.js').functions;
 
-router.get('/', async (req, res) => { 
+router.get('/', (req, res) => { 
 	res.status(400).send('You must enter a valid hamster-ID.');
 });
 

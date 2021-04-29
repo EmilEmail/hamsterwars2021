@@ -5,12 +5,13 @@ const functions = require('./globalFunctions.js').functions;
 
 
 
-router.get('/', async (req, res) => { 
+router.get('/', (req, res) => { 
 	res.status(400).send('You must enter valid hamster-IDs.');
 });
-router.get('/:id', async (req, res) => { 
+router.get('/:id', (req, res) => { 
 	res.status(400).send('You must enter TWO valid hamster-IDs.');
 });
+
 router.get('/:challenger/:defender', async (req, res) => { 
 	const challengerId = req.params.challenger;
 	const defenderId = req.params.defender;
@@ -39,9 +40,12 @@ router.get('/:challenger/:defender', async (req, res) => {
 		}
 	});
 
+	//Kanske ta bort inför frontend???
 	if(matchMatches < 1) {
 		res.status(200).send('No games between these two before..')
+		return;
 	}
+	//
 
 	matchMatches.forEach(match => {
 		if (match.winnerId === challengerId) {
